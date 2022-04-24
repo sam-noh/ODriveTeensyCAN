@@ -87,7 +87,7 @@ void ODriveTeensyCAN::SetPosition(int axis_id, float position, float velocity_fe
     msg_data[6] = current_feedforward_b[0];
     msg_data[7] = current_feedforward_b[1];
 
-    sendMessage(axis_id, CMD_ID_SET_INPUT_POS, false, 8, position_b);
+    sendMessage(axis_id, CMD_ID_SET_INPUT_POS, false, 8, msg_data);
 }
 
 void ODriveTeensyCAN::SetVelocity(int axis_id, float velocity) {
