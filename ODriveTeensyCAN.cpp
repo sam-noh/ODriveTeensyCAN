@@ -87,7 +87,7 @@ void ODriveTeensyCAN::SetPosition(int axis_id, float position, float velocity_fe
     msg_data[6] = current_feedforward_b[0];
     msg_data[7] = current_feedforward_b[1];
 
-    sendMessage(axis_id, CMD_ID_SET_INPUT_POS, false, 8, position_b);
+    sendMessage(axis_id, CMD_ID_SET_INPUT_POS, false, 8, msg_data);
 }
 
 void ODriveTeensyCAN::SetVelocity(int axis_id, float velocity) {
@@ -108,7 +108,7 @@ void ODriveTeensyCAN::SetVelocity(int axis_id, float velocity, float current_fee
     msg_data[6] = current_feedforward_b[2];
     msg_data[7] = current_feedforward_b[3];
     
-    sendMessage(axis_id, CMD_ID_SET_INPUT_VEL, false, 8, velocity_b);
+    sendMessage(axis_id, CMD_ID_SET_INPUT_VEL, false, 8, msg_data);
 }
 
 void ODriveTeensyCAN::SetLimits(int axis_id, float velocity_limit, float current_limit) {
@@ -125,7 +125,7 @@ void ODriveTeensyCAN::SetLimits(int axis_id, float velocity_limit, float current
     msg_data[6] = current_limit_b[2];
     msg_data[7] = current_limit_b[3];
 
-    sendMessage(axis_id, CMD_ID_SET_LIMITS, false, 8, velocity_limit_b);
+    sendMessage(axis_id, CMD_ID_SET_LIMITS, false, 8, msg_data);
 }
 
 void ODriveTeensyCAN::SetTorque(int axis_id, float torque) {
@@ -164,7 +164,7 @@ void ODriveTeensyCAN::SetVelocityGains(int axis_id, float velocity_gain, float v
     msg_data[6] = velocity_integrator_gain_b[2];
     msg_data[7] = velocity_integrator_gain_b[3];
 
-    sendMessage(axis_id, CMD_ID_VEL_GAINS, false, 8, velocity_gains_b);
+    sendMessage(axis_id, CMD_ID_VEL_GAINS, false, 8, msg_data);
 }
 
 float ODriveTeensyCAN::GetPosition(int axis_id) {
