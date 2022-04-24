@@ -33,7 +33,7 @@ public:
         CMD_ID_SET_INPUT_POS = 0x00C,
         CMD_ID_SET_INPUT_VEL = 0x00D,
         CMD_ID_SET_INPUT_TORQUE = 0x00E,
-        CMD_ID_SET_VELOCITY_LIMIT = 0x00F,
+		CMD_ID_SET_LIMITS = 0x00F,
         CMD_ID_START_ANTICOGGING = 0x010,
         CMD_ID_SET_TRAJ_VEL_LIMIT = 0x011,
         CMD_ID_SET_TRAJ_ACCEL_LIMITS = 0x012,
@@ -43,6 +43,10 @@ public:
         CMD_ID_REBOOT_ODRIVE = 0x016,
         CMD_ID_GET_VBUS_VOLTAGE = 0x017,
         CMD_ID_CLEAR_ERRORS = 0x018,
+		CMD_ID_SET_LINEAR_COUNT = 0x019,
+		CMD_ID_SET_POS_GAIN = 0x01A,
+		CMD_ID_SET_VEL_GAINS = 0x01B,
+		CMD_ID_GET_ADC_VOLTAGE = 0x01C,
         CMD_ID_CANOPEN_HEARTBEAT_MESSAGE = 0x700
     };
 
@@ -61,7 +65,11 @@ public:
     void SetVelocity(int axis_id, float velocity, float current_feedforward);
 	void SetVelocityLimit(int axis_id, float velocity_limit);
     void SetTorque(int axis_id, float torque);
+	void SetLimits(int axis_id, float velocity_limit, float current_limit);
 	void ClearErrors(int axis_id);
+	void SetLinearCount(int axis_id, int linear_count);
+	void SetPositionGain(int axis_id, float position_gain);
+	void SetVelocityGains(int axis_id, float velocity_gain, float velocity_integrator_gain);
 
     // Getters
     float GetPosition(int axis_id);
@@ -70,6 +78,7 @@ public:
     uint32_t GetEncoderError(int axis_id);
     uint32_t GetAxisError(int axis_id);
     uint32_t GetCurrentState(int axis_id);
+	float GetADCVoltage(int axis_id, int gpio_num);
 
     // State helper
     bool RunState(int axis_id, int requested_state);

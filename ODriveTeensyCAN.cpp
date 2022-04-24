@@ -111,10 +111,21 @@ void ODriveTeensyCAN::SetVelocity(int axis_id, float velocity, float current_fee
     sendMessage(axis_id, CMD_ID_SET_INPUT_VEL, false, 8, velocity_b);
 }
 
-void ODriveTeensyCAN::SetVelocityLimit(int axis_id, float velocity_limit) {
+void ODriveTeensyCAN::SetLimits(int axis_id, float velocity_limit, float current_limit) {
     byte* velocity_limit_b = (byte*) &velocity_limit;
+	byte* current_limit_b = (byte*) &current_limit;
+    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    sendMessage(axis_id, CMD_ID_SET_VELOCITY_LIMIT, false, 4, velocity_limit_b);
+    msg_data[0] = velocity_b[0];
+    msg_data[1] = velocity_b[1];
+    msg_data[2] = velocity_b[2];
+    msg_data[3] = velocity_b[3];
+    msg_data[4] = current_limit_b[0];
+    msg_data[5] = current_limit_b[1];
+    msg_data[6] = current_limit_b[2];
+    msg_data[7] = current_limit_b[3];
+
+    sendMessage(axis_id, CMD_ID_SET_LIMITS, false, 8, velocity_limit_b);
 }
 
 void ODriveTeensyCAN::SetTorque(int axis_id, float torque) {
@@ -125,6 +136,35 @@ void ODriveTeensyCAN::SetTorque(int axis_id, float torque) {
 
 void ODriveTeensyCAN::ClearErrors(int axis_id) {
     sendMessage(axis_id, CMD_ID_CLEAR_ERRORS, false, 0, 0);
+}
+
+void ODriveTeensyCAN::SetLinearCount(int axis_id, int linear_count) {
+    byte* linear_count_b = (byte*) &linear_count;
+
+    sendMessage(axis_id, CMD_ID_SET_LINEAR_COUNT, false, 4, linear_count_b);
+}
+
+void ODriveTeensyCAN::SetPositionGain(int axis_id, float position_gain) {
+    byte* position_gain_b = (byte*) &position_gain;
+
+    sendMessage(axis_id, CMD_ID_SET_POS_GAIN, false, 4, position_gain_b);
+}
+
+void ODriveTeensyCAN::SetVelocityGains(int axis_id, float velocity_gain, float velocity_integrator_gain) {
+    byte* velocity_gain_b = (byte*) &velocity_gain;
+	byte* velocity_integrator_gain_b = (byte*) &velocity_integrator_gain;
+    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    msg_data[0] = velocity_gain_b[0];
+    msg_data[1] = velocity_gain_b[1];
+    msg_data[2] = velocity_gain_b[2];
+    msg_data[3] = velocity_gain_b[3];
+    msg_data[4] = velocity_integrator_gain_b[0];
+    msg_data[5] = velocity_integrator_gain_b[1];
+    msg_data[6] = velocity_integrator_gain_b[2];
+    msg_data[7] = velocity_integrator_gain_b[3];
+
+    sendMessage(axis_id, CMD_ID_VEL_GAINS, false, 8, velocity_gains_b);
 }
 
 float ODriveTeensyCAN::GetPosition(int axis_id) {
@@ -217,6 +257,19 @@ uint32_t ODriveTeensyCAN::GetCurrentState(int axis_id) {
             return output;
         }
     }
+}
+
+float ODriveTeensyCAN::GetADCVoltage(int axis_id, int gpio_num) {
+    byte* gpio_num_b = (byte*) &gpio_num;
+
+    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, true, 4, gpio_num_b);
+
+    float_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[0];
+    *((uint8_t *)(&output) + 1) = msg_data[1];
+    *((uint8_t *)(&output) + 2) = msg_data[2];
+    *((uint8_t *)(&output) + 3) = msg_data[3];
+    return output;
 }
 
 bool ODriveTeensyCAN::RunState(int axis_id, int requested_state) {
