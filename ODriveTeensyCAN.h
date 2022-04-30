@@ -50,7 +50,9 @@ public:
         CMD_ID_CANOPEN_HEARTBEAT_MESSAGE = 0x700
     };
 
-    ODriveTeensyCAN();
+    ODriveTeensyCAN(CAN_DEV_TABLE CANBus, int CANBaudRate);
+	
+	int CANBaudRate = 250000;  //250,000 is odrive default
 
     void sendMessage(int axis_id, int cmd_id, bool remote_transmission_request, int length, byte *signal_bytes);
 	
