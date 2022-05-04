@@ -11,7 +11,6 @@
 Heartbeat	KEYWORD1
 SetPosition	KEYWORD1
 SetVelocity	KEYWORD1
-SetVelocityLimit	KEYWORD1
 SetTorque	KEYWORD1
 GetPosition	KEYWORD1
 GetVelocity	KEYWORD1
@@ -19,6 +18,8 @@ GetMotorError	KEYWORD1
 GetEncoderError	KEYWORD1
 GetAxisError	KEYWORD1
 GetCurrentState	KEYWORD1
+GetVbusVoltage  KEYWORD1
+GetADCVoltage	KEYWORD1
 RunState	KEYWORD1
 
 

@@ -79,7 +79,8 @@ public:
     uint32_t GetMotorError(int axis_id);
     uint32_t GetEncoderError(int axis_id);
     uint32_t GetAxisError(int axis_id);
-    uint32_t GetCurrentState(int axis_id);
+    uint8_t GetCurrentState(int axis_id);
+	float GetVbusVoltage();  //Can be sent to either axis. Using axis0 for ease
 	float GetADCVoltage(int axis_id, int gpio_num);
 
     // State helper
