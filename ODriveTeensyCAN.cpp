@@ -258,9 +258,9 @@ uint8_t ODriveTeensyCAN::GetCurrentState(int axis_id) {
 }
 
 float ODriveTeensyCAN::GetVbusVoltage() {
-    byte msg_data[8] = {0, 0, 0, 0};
+    byte msg_data[4] = {0, 0, 0, 0};
 
-    sendMessage(0, CMD_ID_GET_VBUS_VOLTAGE, true, 8, msg_data);  //0 is axis id. 0 or 1 would work
+    sendMessage(0, CMD_ID_GET_VBUS_VOLTAGE, true, 4, msg_data);  //0 is axis id. 0 or 1 would work
 
     float_t output;
     *((uint8_t *)(&output) + 0) = msg_data[0];
