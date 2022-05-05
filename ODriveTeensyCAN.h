@@ -16,6 +16,25 @@ public:
         AXIS_STATE_ENCODER_OFFSET_CALIBRATION = 7, //<! run encoder offset calibration
         AXIS_STATE_CLOSED_LOOP_CONTROL = 8  //<! run closed loop control
     };
+	
+	enum ControlMode_t {
+		VOLTAGE_CONTROL = 0,
+		TORQUE_CONTROL = 1,
+		VELOCITY_CONTROL = 2,
+		POSITION_CONTROL = 3
+	};
+	
+	enum InputMode_t {
+		INACTIVE = 0,
+		PASSTHROUGH = 1,
+		VEL_RAMP = 2,
+		POS_FILTER = 3,
+		MIX_CHANNELS = 4,
+		TRAP_TRAJ = 5,
+		TORQUE_RAMP = 6,
+		MIRROR = 7,
+		TUNING = 8
+	};
 
     enum CommandId_t {
         CMD_ID_CANOPEN_NMT_MESSAGE = 0x000,
@@ -60,6 +79,9 @@ public:
 	int Heartbeat();
 
     // Commands
+	void SetAxisNodeId(int axis_id, int node_id);
+	void SetControlMode(int axis_id, int control_mode);
+	void SetInputMode(int axis_id, int input_mode);
     void SetPosition(int axis_id, float position);
     void SetPosition(int axis_id, float position, float velocity_feedforward);
     void SetPosition(int axis_id, float position, float velocity_feedforward, float current_feedforward);
@@ -68,6 +90,9 @@ public:
 	void SetVelocityLimit(int axis_id, float velocity_limit);
     void SetTorque(int axis_id, float torque);
 	void SetLimits(int axis_id, float velocity_limit, float current_limit);
+	void SetTrajVelLimit(int axis_id, float traj_vel_limit);
+	void SetTrajAccelLimit(int axis_id, float traj_accel_limit);
+	void SetTrajDecelLimit(int axis_id, float traj_decel_limit);
 	void ClearErrors(int axis_id);
 	void SetLinearCount(int axis_id, int linear_count);
 	void SetPositionGain(int axis_id, float position_gain);
@@ -76,6 +101,8 @@ public:
     // Getters
     float GetPosition(int axis_id);
     float GetVelocity(int axis_id);
+	int32_t GetEncoderShadowCount(int axis_id);
+	int32_t GetEncoderCountInCPR(int axis_id);
     uint32_t GetMotorError(int axis_id);
     uint32_t GetEncoderError(int axis_id);
     uint32_t GetAxisError(int axis_id);

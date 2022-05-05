@@ -62,6 +62,36 @@ int ODriveTeensyCAN::Heartbeat() {
 	}
 }
 
+void ODriveTeensyCAN::SetAxisNodeId(int axis_id, int node_id) {
+	byte* node_id_b = (byte*) &node_id;
+	
+	sendMessage(axis_id, CMD_ID_SET_AXIS_NODE_ID, false, 4, node_id_b);
+}
+
+void ODriveTeensyCAN::SetControlMode(int axis_id, int control_mode) {
+	byte* control_mode_b = (byte*) &control_mode;
+	byte msg_data[4] = {0, 0, 0, 0};
+	
+	msg_data[0] = control_mode_b[0];
+	msg_data[1] = control_mode_b[1];
+	msg_data[2] = control_mode_b[2];
+	msg_data[3] = control_mode_b[3];
+	
+	sendMessage(axis_id, CMD_ID_SET_CONTROLLER_MODES, false, 4, msg_data);
+}
+
+void ODriveTeensyCAN::SetInputMode(int axis_id, int input_mode) {
+	byte* input_mode_b = (byte*) &input_mode;
+	byte msg_data[4] = {0, 0, 0, 0};
+	
+	msg_data[4] = control_mode_b[0];
+	msg_data[5] = control_mode_b[1];
+	msg_data[6] = control_mode_b[2];
+	msg_data[7] = control_mode_b[3];
+	
+	sendMessage(axis_id, CMD_ID_SET_CONTROLLER_MODES, false, 4, msg_data);
+}
+
 void ODriveTeensyCAN::SetPosition(int axis_id, float position) {
     SetPosition(axis_id, position, 0.0f, 0.0f);
 }
@@ -112,6 +142,12 @@ void ODriveTeensyCAN::SetVelocity(int axis_id, float velocity, float current_fee
     sendMessage(axis_id, CMD_ID_SET_INPUT_VEL, false, 8, msg_data);
 }
 
+void ODriveTeensyCAN::SetTorque(int axis_id, float torque) {
+    byte* torque_b = (byte*) &torque;
+
+    sendMessage(axis_id, CMD_ID_SET_INPUT_TORQUE, false, 4, torque_b);
+}
+
 void ODriveTeensyCAN::SetLimits(int axis_id, float velocity_limit, float current_limit) {
     byte* velocity_limit_b = (byte*) &velocity_limit;
 	byte* current_limit_b = (byte*) &current_limit;
@@ -129,10 +165,34 @@ void ODriveTeensyCAN::SetLimits(int axis_id, float velocity_limit, float current
     sendMessage(axis_id, CMD_ID_SET_LIMITS, false, 8, msg_data);
 }
 
-void ODriveTeensyCAN::SetTorque(int axis_id, float torque) {
-    byte* torque_b = (byte*) &torque;
+void ODriveTeensyCAN::SetTrajVelLimit(int axis_id, float traj_vel_limit) {
+    byte* traj_vel_limit_b = (byte*) &traj_vel_limit;
 
-    sendMessage(axis_id, CMD_ID_SET_INPUT_TORQUE, false, 4, torque_b);
+    sendMessage(axis_id, CMD_ID_SET_TRAJ_VEL_LIMIT, false, 4, traj_vel_limit_b);
+}
+
+void ODriveTeensyCAN::SetTrajAccelLimit(int axis_id, float traj_accel_limit) {
+	byte* traj_accel_limit_b = (byte*) &traj_accel_limit;
+	byte msg_data[4] = {0, 0, 0, 0};
+	
+	msg_data[0] = traj_accel_limit_b[0];
+	msg_data[1] = traj_accel_limit_b[1];
+	msg_data[2] = traj_accel_limit_b[2];
+	msg_data[3] = traj_accel_limit_b[3];
+	
+	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 4, msg_data);
+}
+
+void ODriveTeensyCAN::SetTrajDecelLimit(int axis_id, int traj_decel_limit) {
+	byte* traj_decel_limit_b = (byte*) &traj_decel_limit;
+	byte msg_data[4] = {0, 0, 0, 0};
+	
+	msg_data[4] = traj_decel_limit_b[0];
+	msg_data[5] = traj_decel_limit_b[1];
+	msg_data[6] = traj_decel_limit_b[2];
+	msg_data[7] = traj_decel_limit_b[3];
+	
+	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 4, msg_data);
 }
 
 void ODriveTeensyCAN::ClearErrors(int axis_id) {
@@ -168,6 +228,8 @@ void ODriveTeensyCAN::SetVelocityGains(int axis_id, float velocity_gain, float v
     sendMessage(axis_id, CMD_ID_SET_VEL_GAINS, false, 8, msg_data);
 }
 
+//////////// Get functions ///////////
+
 float ODriveTeensyCAN::GetPosition(int axis_id) {
     byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -187,6 +249,32 @@ float ODriveTeensyCAN::GetVelocity(int axis_id) {
     sendMessage(axis_id, CMD_ID_GET_ENCODER_ESTIMATES, true, 8, msg_data);
 
     float_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[4];
+    *((uint8_t *)(&output) + 1) = msg_data[5];
+    *((uint8_t *)(&output) + 2) = msg_data[6];
+    *((uint8_t *)(&output) + 3) = msg_data[7];
+    return output;
+}
+
+int32_t ODriveTeensyCAN::GetEncoderShadowCount(int axis_id) {
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_ENCODER_COUNT, true, 8, msg_data);
+	
+	int32_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[0];
+    *((uint8_t *)(&output) + 1) = msg_data[1];
+    *((uint8_t *)(&output) + 2) = msg_data[2];
+    *((uint8_t *)(&output) + 3) = msg_data[3];
+    return output;
+}
+
+int32_t ODriveTeensyCAN::GetEncoderCountInCPR(int axis_id) {
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_ENCODER_COUNT, true, 8, msg_data);
+	
+	int32_t output;
     *((uint8_t *)(&output) + 0) = msg_data[4];
     *((uint8_t *)(&output) + 1) = msg_data[5];
     *((uint8_t *)(&output) + 2) = msg_data[6];
