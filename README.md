@@ -7,7 +7,7 @@ Requires FlexCAN_T4 (https://github.com/tonton81/FlexCAN_T4) and ODrive firmware
 You can review the ODrive CAN protocol, called CAN Simple, here: https://newdocs.odriverobotics.com/v/latest/can-protocol.html
 
 
-##Getting Started
+## Getting Started
 
 Your sketch needs to include both FlexCAN_T4 and ODriveTeensyCAN libraries. Be sure to include FlexCAN_T4 *before* ODriveTeensyCAN.
 ```#include <FlexCAN_T4.h>
