@@ -11,5 +11,6 @@ You can review the ODrive CAN protocol, called CAN Simple, here: https://newdocs
 
 Your sketch needs to include both FlexCAN_T4 and ODriveTeensyCAN libraries. Be sure to include FlexCAN_T4 *before* ODriveTeensyCAN.
 ```#include <FlexCAN_T4.h>
-#include <ODriveTeensyCAN.h>```
+#include <ODriveTeensyCAN.h>
+```
 Create ODriveTeensyCAN object with `ODriveTeensyCAN odriveCAN();` where `odriveCAN` is any name you want to call your object. You can optionally change the CAN baud rate by passing a parameter to the constructor `ODriveTeensyCAN odriveCAN(500000);`. The default baud rate is 250000.
