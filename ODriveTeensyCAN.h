@@ -93,6 +93,7 @@ public:
 	void SetTrajVelLimit(int axis_id, float traj_vel_limit);
 	void SetTrajAccelLimit(int axis_id, float traj_accel_limit);
 	void SetTrajDecelLimit(int axis_id, float traj_decel_limit);
+	void SetTrajInertia(int axis_id, float traj_inertia);
 	void ClearErrors(int axis_id);
 	void SetLinearCount(int axis_id, int linear_count);
 	void SetPositionGain(int axis_id, float position_gain);
@@ -103,6 +104,10 @@ public:
     float GetVelocity(int axis_id);
 	int32_t GetEncoderShadowCount(int axis_id);
 	int32_t GetEncoderCountInCPR(int axis_id);
+	float GetIqSetpoint(int axis_id);
+	float GetIqMeasured(int axis_id);
+	float GetSensorlessPosition(int axis_id);
+	float GetSensorlessVelocity(int axis_id);
     uint32_t GetMotorError(int axis_id);
     uint32_t GetEncoderError(int axis_id);
     uint32_t GetAxisError(int axis_id);

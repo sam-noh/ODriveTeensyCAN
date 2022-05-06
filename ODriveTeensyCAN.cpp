@@ -195,6 +195,12 @@ void ODriveTeensyCAN::SetTrajDecelLimit(int axis_id, int traj_decel_limit) {
 	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 4, msg_data);
 }
 
+void ODriveTeensyCAN::SetTrajInertia(int axis_id, float traj_inertia) {
+    byte* traj_inertia_b = (byte*) &traj_inertia;
+
+    sendMessage(axis_id, CMD_ID_SET_TRAJ_INERTIA, false, 4, traj_inertia_b);
+}
+
 void ODriveTeensyCAN::ClearErrors(int axis_id) {
     sendMessage(axis_id, CMD_ID_CLEAR_ERRORS, false, 0, 0);
 }
@@ -282,6 +288,58 @@ int32_t ODriveTeensyCAN::GetEncoderCountInCPR(int axis_id) {
     return output;
 }
 
+float ODriveTeensyCAN::GetIqSetpoint(int axis_id) {
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_IQ, true, 8, msg_data);
+	
+	float_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[0];
+    *((uint8_t *)(&output) + 1) = msg_data[1];
+    *((uint8_t *)(&output) + 2) = msg_data[2];
+    *((uint8_t *)(&output) + 3) = msg_data[3];
+    return output;
+}
+
+float ODriveTeensyCAN::GetIqMeasured(int axis_id) {
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_IQ, true, 8, msg_data);
+	
+	float_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[4];
+    *((uint8_t *)(&output) + 1) = msg_data[5];
+    *((uint8_t *)(&output) + 2) = msg_data[6];
+    *((uint8_t *)(&output) + 3) = msg_data[7];
+    return output;
+}
+
+float ODriveTeensyCAN::GetSensorlessPosition(int axis_id) {
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_SENSORLESS_ESTIMATES, true, 8, msg_data);
+	
+	float_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[0];
+    *((uint8_t *)(&output) + 1) = msg_data[1];
+    *((uint8_t *)(&output) + 2) = msg_data[2];
+    *((uint8_t *)(&output) + 3) = msg_data[3];
+    return output;
+}
+
+float ODriveTeensyCAN::GetSensorlessVelocity(int axis_id) {
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_SENSORLESS_ESTIMATES, true, 8, msg_data);
+	
+	float_t output;
+    *((uint8_t *)(&output) + 0) = msg_data[4];
+    *((uint8_t *)(&output) + 1) = msg_data[5];
+    *((uint8_t *)(&output) + 2) = msg_data[6];
+    *((uint8_t *)(&output) + 3) = msg_data[7];
+    return output;
+}
+
 uint32_t ODriveTeensyCAN::GetMotorError(int axis_id) {
     byte msg_data[4] = {0, 0, 0, 0};
 
@@ -360,9 +418,11 @@ float ODriveTeensyCAN::GetVbusVoltage() {
 
 float ODriveTeensyCAN::GetADCVoltage(int axis_id, int gpio_num) {
     byte* gpio_num_b = (byte*) &gpio_num;
-    byte msg_data[4] = {0, 0, 0, 0};
+    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, true, 4, gpio_num_b);
+	msg_data[0] = gpio_num_b;
+	
+    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, true, 8, msg_data);
 
     float_t output;
     *((uint8_t *)(&output) + 0) = msg_data[0];

@@ -15,6 +15,7 @@ SetInputMode       KEYWORD1
 SetTrajVelLimit    KEYWORD1
 SetTrajAccelLimit  KEYWORD1
 SetTrajDecelLimit  KEYWORD1
+SetTrajInertia     KEYWORD1
 SetPosition	KEYWORD1
 SetVelocity	KEYWORD1
 SetTorque	KEYWORD1
@@ -24,6 +25,10 @@ GetEncoderShadowCount  KEYWORD1
 GetEncoderCountInCPR   KEYWORD1
 GetEncoderShadowCount  KEYWORD1
 GetEncoderCountInCPR   KEYWORD1
+GetIqSetpoint          KEYWORD1
+GetIqMeasured          KEYWORD1
+GetSensorlessPosition  KEYWORD1
+GetSensorlessVelocity  KEYWORD1
 GetMotorError	KEYWORD1
 GetEncoderError	KEYWORD1
 GetAxisError	KEYWORD1
