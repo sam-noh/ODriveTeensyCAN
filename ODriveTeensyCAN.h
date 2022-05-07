@@ -75,10 +75,10 @@ public:
 
     void sendMessage(int axis_id, int cmd_id, bool remote_transmission_request, int length, byte *signal_bytes);
 	
-	//Heartbeat
+	// Heartbeat
 	int Heartbeat();
 
-    // Commands
+    // Setters
 	void SetAxisNodeId(int axis_id, int node_id);
 	void SetControlMode(int axis_id, int control_mode);
 	void SetInputMode(int axis_id, int input_mode);
@@ -94,7 +94,6 @@ public:
 	void SetTrajAccelLimit(int axis_id, float traj_accel_limit);
 	void SetTrajDecelLimit(int axis_id, float traj_decel_limit);
 	void SetTrajInertia(int axis_id, float traj_inertia);
-	void ClearErrors(int axis_id);
 	void SetLinearCount(int axis_id, int linear_count);
 	void SetPositionGain(int axis_id, float position_gain);
 	void SetVelocityGains(int axis_id, float velocity_gain, float velocity_integrator_gain);
@@ -114,10 +113,16 @@ public:
     uint8_t GetCurrentState(int axis_id);
 	float GetVbusVoltage();  //Can be sent to either axis. Using axis0 for ease
 	float GetADCVoltage(int axis_id, int gpio_num);
+	
+	// Other functions
+	void Estop(int axis_id);
+	void StartAnticogging(int axis_id);
+	void RebootOdrive();
+	void ClearErrors(int axis_id);
 
     // State helper
     bool RunState(int axis_id, int requested_state);
 
 };
 
-#endif
+#endif@

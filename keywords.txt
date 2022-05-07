@@ -35,6 +35,10 @@ GetAxisError	KEYWORD1
 GetCurrentState	KEYWORD1
 GetVbusVoltage  KEYWORD1
 GetADCVoltage	KEYWORD1
+Estop           KEYWORD1
+StartAnticogging  KEYWORD1
+RebootOdrive    KEYWORD1
+ClearErrors     KEYWORD1
 RunState	    KEYWORD1
 
 
