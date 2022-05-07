@@ -183,7 +183,7 @@ void ODriveTeensyCAN::SetTrajAccelLimit(int axis_id, float traj_accel_limit) {
 	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 4, msg_data);
 }
 
-void ODriveTeensyCAN::SetTrajDecelLimit(int axis_id, int traj_decel_limit) {
+void ODriveTeensyCAN::SetTrajDecelLimit(int axis_id, float traj_decel_limit) {
 	byte* traj_decel_limit_b = (byte*) &traj_decel_limit;
 	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
@@ -416,7 +416,7 @@ float ODriveTeensyCAN::GetADCVoltage(int axis_id, int gpio_num) {
     byte* gpio_num_b = (byte*) &gpio_num;
     byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-	msg_data[0] = gpio_num_b;
+	msg_data[0] = gpio_num_b[0];
 	
     sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, true, 8, msg_data);
 
@@ -437,7 +437,7 @@ void ODriveTeensyCAN::StartAnticogging(int axis_id) {
     sendMessage(axis_id, CMD_ID_START_ANTICOGGING, false, 0, 0);  //message requires no data, thus the 0, 0
 }
 void ODriveTeensyCAN::RebootOdrive() {  //message can be sent to either axis
-    sendMessage(axis_id, CMD_ID_REBOOT_ODRIVE, false, 0, 0);  //first 0 is axis id. 0 or 1 would work
+    sendMessage(0, CMD_ID_REBOOT_ODRIVE, false, 0, 0);  //first 0 is axis id. 0 or 1 would work
 }
 void ODriveTeensyCAN::ClearErrors(int axis_id) {
     sendMessage(axis_id, CMD_ID_CLEAR_ERRORS, false, 0, 0);  //message requires no data, thus the 0, 0
