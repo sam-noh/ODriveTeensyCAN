@@ -10,12 +10,10 @@
 
 Heartbeat	       KEYWORD1
 SetAxisNodeId      KEYWORD1
-SetControlMode     KEYWORD1
-SetInputMode       KEYWORD1
-SetTrajVelLimit    KEYWORD1
-SetTrajAccelLimit  KEYWORD1
-SetTrajDecelLimit  KEYWORD1
-SetTrajInertia     KEYWORD1
+SetControllerModes     KEYWORD1
+SetTrajVelLimit     KEYWORD1
+SetTrajAccelLimits  KEYWORD1
+SetTrajInertia      KEYWORD1
 SetPosition	KEYWORD1
 SetVelocity	KEYWORD1
 SetTorque	KEYWORD1

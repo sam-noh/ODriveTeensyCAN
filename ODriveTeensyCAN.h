@@ -80,19 +80,16 @@ public:
 
     // Setters
 	void SetAxisNodeId(int axis_id, int node_id);
-	void SetControlMode(int axis_id, int control_mode);
-	void SetInputMode(int axis_id, int input_mode);
+	void SetControllerModes(int axis_id, int control_mode, int input_mode);
     void SetPosition(int axis_id, float position);
     void SetPosition(int axis_id, float position, float velocity_feedforward);
     void SetPosition(int axis_id, float position, float velocity_feedforward, float current_feedforward);
     void SetVelocity(int axis_id, float velocity);
     void SetVelocity(int axis_id, float velocity, float current_feedforward);
-	void SetVelocityLimit(int axis_id, float velocity_limit);
     void SetTorque(int axis_id, float torque);
 	void SetLimits(int axis_id, float velocity_limit, float current_limit);
 	void SetTrajVelLimit(int axis_id, float traj_vel_limit);
-	void SetTrajAccelLimit(int axis_id, float traj_accel_limit);
-	void SetTrajDecelLimit(int axis_id, float traj_decel_limit);
+	void SetTrajAccelLimits(int axis_id, float traj_accel_limit, float traj_decel_limit);
 	void SetTrajInertia(int axis_id, float traj_inertia);
 	void SetLinearCount(int axis_id, int linear_count);
 	void SetPositionGain(int axis_id, float position_gain);
@@ -111,13 +108,13 @@ public:
     uint32_t GetEncoderError(int axis_id);
     uint32_t GetAxisError(int axis_id);
     uint8_t GetCurrentState(int axis_id);
-	float GetVbusVoltage();  //Can be sent to either axis. Using axis0 for ease
+	float GetVbusVoltage(int axis_id);  //Can be sent to either axis
 	float GetADCVoltage(int axis_id, int gpio_num);
 	
 	// Other functions
 	void Estop(int axis_id);
 	void StartAnticogging(int axis_id);
-	void RebootOdrive();
+	void RebootOdrive(int axis_id);  //Can be sent to either axis
 	void ClearErrors(int axis_id);
 
     // State helper

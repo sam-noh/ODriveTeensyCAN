@@ -68,28 +68,21 @@ void ODriveTeensyCAN::SetAxisNodeId(int axis_id, int node_id) {
 	sendMessage(axis_id, CMD_ID_SET_AXIS_NODE_ID, false, 4, node_id_b);
 }
 
-void ODriveTeensyCAN::SetControlMode(int axis_id, int control_mode) {
+void ODriveTeensyCAN::SetControllerModes(int axis_id, int control_mode, int input_mode) {
 	byte* control_mode_b = (byte*) &control_mode;
-	byte msg_data[4] = {0, 0, 0, 0};
+	byte* input_mode_b = (byte*) &input_mode;
+	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
 	msg_data[0] = control_mode_b[0];
 	msg_data[1] = control_mode_b[1];
 	msg_data[2] = control_mode_b[2];
-	msg_data[3] = control_mode_b[3];
-	
-	sendMessage(axis_id, CMD_ID_SET_CONTROLLER_MODES, false, 4, msg_data);
-}
-
-void ODriveTeensyCAN::SetInputMode(int axis_id, int input_mode) {
-	byte* input_mode_b = (byte*) &input_mode;
-	byte msg_data[4] = {0, 0, 0, 0};
-	
+	msg_data[3] = control_mode_b[3];	
 	msg_data[4] = input_mode_b[0];
 	msg_data[5] = input_mode_b[1];
 	msg_data[6] = input_mode_b[2];
 	msg_data[7] = input_mode_b[3];
 	
-	sendMessage(axis_id, CMD_ID_SET_CONTROLLER_MODES, false, 4, msg_data);
+	sendMessage(axis_id, CMD_ID_SET_CONTROLLER_MODES, false, 8, msg_data);
 }
 
 void ODriveTeensyCAN::SetPosition(int axis_id, float position) {
@@ -171,28 +164,21 @@ void ODriveTeensyCAN::SetTrajVelLimit(int axis_id, float traj_vel_limit) {
     sendMessage(axis_id, CMD_ID_SET_TRAJ_VEL_LIMIT, false, 4, traj_vel_limit_b);
 }
 
-void ODriveTeensyCAN::SetTrajAccelLimit(int axis_id, float traj_accel_limit) {
+void ODriveTeensyCAN::SetTrajAccelLimits(int axis_id, float traj_accel_limit, float traj_decel_limit) {
 	byte* traj_accel_limit_b = (byte*) &traj_accel_limit;
+	byte* traj_decel_limit_b = (byte*) &traj_decel_limit;
 	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
 	msg_data[0] = traj_accel_limit_b[0];
 	msg_data[1] = traj_accel_limit_b[1];
 	msg_data[2] = traj_accel_limit_b[2];
 	msg_data[3] = traj_accel_limit_b[3];
-	
-	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 4, msg_data);
-}
-
-void ODriveTeensyCAN::SetTrajDecelLimit(int axis_id, float traj_decel_limit) {
-	byte* traj_decel_limit_b = (byte*) &traj_decel_limit;
-	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	
 	msg_data[4] = traj_decel_limit_b[0];
 	msg_data[5] = traj_decel_limit_b[1];
 	msg_data[6] = traj_decel_limit_b[2];
 	msg_data[7] = traj_decel_limit_b[3];
 	
-	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 4, msg_data);
+	sendMessage(axis_id, CMD_ID_SET_TRAJ_ACCEL_LIMITS, false, 8, msg_data);
 }
 
 void ODriveTeensyCAN::SetTrajInertia(int axis_id, float traj_inertia) {
@@ -399,10 +385,10 @@ uint8_t ODriveTeensyCAN::GetCurrentState(int axis_id) {
     }
 }
 
-float ODriveTeensyCAN::GetVbusVoltage() {  //message can be sent to either axis
+float ODriveTeensyCAN::GetVbusVoltage(int axis_id) {  //message can be sent to either axis
     byte msg_data[4] = {0, 0, 0, 0};
 
-    sendMessage(0, CMD_ID_GET_VBUS_VOLTAGE, true, 4, msg_data);  //0 is axis id. 0 or 1 would work
+    sendMessage(axis_id, CMD_ID_GET_VBUS_VOLTAGE, true, 4, msg_data);
 
     float_t output;
     *((uint8_t *)(&output) + 0) = msg_data[0];
@@ -436,8 +422,8 @@ void ODriveTeensyCAN::Estop(int axis_id) {
 void ODriveTeensyCAN::StartAnticogging(int axis_id) {
     sendMessage(axis_id, CMD_ID_START_ANTICOGGING, false, 0, 0);  //message requires no data, thus the 0, 0
 }
-void ODriveTeensyCAN::RebootOdrive() {  //message can be sent to either axis
-    sendMessage(0, CMD_ID_REBOOT_ODRIVE, false, 0, 0);  //first 0 is axis id. 0 or 1 would work
+void ODriveTeensyCAN::RebootOdrive(int axis_id) {  //message can be sent to either axis
+    sendMessage(axis_id, CMD_ID_REBOOT_ODRIVE, false, 0, 0);
 }
 void ODriveTeensyCAN::ClearErrors(int axis_id) {
     sendMessage(axis_id, CMD_ID_CLEAR_ERRORS, false, 0, 0);  //message requires no data, thus the 0, 0
