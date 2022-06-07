@@ -39,7 +39,7 @@ void ODriveTeensyCAN::sendMessage(int axis_id, int cmd_id, bool remote_transmiss
     msg.flags.remote = remote_transmission_request;
     msg.len = length;
     if (!remote_transmission_request) {
-        memcpy(msg.buf, signal_bytes, sizeof(signal_bytes));
+        memcpy(msg.buf, signal_bytes, length));
         Can0.write(msg);
         return;
     }

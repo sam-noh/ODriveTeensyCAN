@@ -109,7 +109,7 @@ public:
     uint32_t GetAxisError(int axis_id);
     uint8_t GetCurrentState(int axis_id);
 	float GetVbusVoltage(int axis_id);  //Can be sent to either axis
-	float GetADCVoltage(int axis_id, int gpio_num);
+	float GetADCVoltage(int axis_id, int gpio_num);  //Can be sent to either axis
 	
 	// Other functions
 	void Estop(int axis_id);
