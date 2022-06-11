@@ -66,6 +66,7 @@ public:
 		CMD_ID_SET_POS_GAIN = 0x01A,
 		CMD_ID_SET_VEL_GAINS = 0x01B,
 		CMD_ID_GET_ADC_VOLTAGE = 0x01C,
+		CMD_ID_SEND_ADC_VOLTAGE = 0x01D,
         CMD_ID_CANOPEN_HEARTBEAT_MESSAGE = 0x700
     };
 
@@ -109,7 +110,7 @@ public:
     uint32_t GetAxisError(int axis_id);
     uint8_t GetCurrentState(int axis_id);
 	float GetVbusVoltage(int axis_id);  //Can be sent to either axis
-	float GetADCVoltage(int axis_id, int gpio_num);  //Can be sent to either axis
+	float GetADCVoltage(int axis_id, uint8_t gpio_num);  //Can be sent to either axis
 	
 	// Other functions
 	void Estop(int axis_id);

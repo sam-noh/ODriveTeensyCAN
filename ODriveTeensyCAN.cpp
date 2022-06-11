@@ -38,13 +38,26 @@ void ODriveTeensyCAN::sendMessage(int axis_id, int cmd_id, bool remote_transmiss
     msg.id = (axis_id << CommandIDLength) + cmd_id;
     msg.flags.remote = remote_transmission_request;
     msg.len = length;
-    if (!remote_transmission_request) {
-        memcpy(msg.buf, signal_bytes, length));
+    if (!remote_transmission_request && cmd_id != CMD_ID_GET_ADC_VOLTAGE) {
+        memcpy(msg.buf, signal_bytes, length);
         Can0.write(msg);
         return;
     }
 
-    Can0.write(msg);
+	if(cmd_id == CMD_ID_GET_ADC_VOLTAGE) {
+        memcpy(msg.buf, signal_bytes, length);
+		uint32_t return_id = (axis_id << CommandIDLength) + CMD_ID_SEND_ADC_VOLTAGE;
+		
+		Can0.write(msg);
+		while (true) {
+			if (Can0.read(return_msg) && (return_msg.id == return_id)) {
+				memcpy(signal_bytes, return_msg.buf, sizeof(return_msg.buf));
+				return;
+			}
+		}
+	}
+	
+	Can0.write(msg);
     while (true) {
         if (Can0.read(return_msg) && (return_msg.id == msg.id)) {
             memcpy(signal_bytes, return_msg.buf, sizeof(return_msg.buf));
@@ -398,13 +411,12 @@ float ODriveTeensyCAN::GetVbusVoltage(int axis_id) {  //message can be sent to e
     return output;
 }
 
-float ODriveTeensyCAN::GetADCVoltage(int axis_id, int gpio_num) {
-    byte* gpio_num_b = (byte*) &gpio_num;
-    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+float ODriveTeensyCAN::GetADCVoltage(int axis_id, uint8_t gpio_num) {
+    byte msg_data[4] = {0, 0, 0, 0};
 
-	msg_data[0] = gpio_num_b[0];
+	msg_data[0] = gpio_num;
 	
-    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, true, 8, msg_data);
+    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, false, 1, msg_data);  //RTR must be false!
 
     float_t output;
     *((uint8_t *)(&output) + 0) = msg_data[0];
