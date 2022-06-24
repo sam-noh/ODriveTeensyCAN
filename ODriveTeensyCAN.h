@@ -81,6 +81,7 @@ public:
 
     // Setters
 	void SetAxisNodeId(int axis_id, int node_id);
+	void SetControllerModes(int axis_id, int control_mode);
 	void SetControllerModes(int axis_id, int control_mode, int input_mode);
     void SetPosition(int axis_id, float position);
     void SetPosition(int axis_id, float position, float velocity_feedforward);

@@ -81,6 +81,10 @@ void ODriveTeensyCAN::SetAxisNodeId(int axis_id, int node_id) {
 	sendMessage(axis_id, CMD_ID_SET_AXIS_NODE_ID, false, 4, node_id_b);
 }
 
+void ODriveTeensyCAN::SetControllerModes(int axis_id, int control_mode) {
+	SetControllerModes(int axis_id, int control_mode, 1);  //1 == default input_mode as passthrough
+}
+
 void ODriveTeensyCAN::SetControllerModes(int axis_id, int control_mode, int input_mode) {
 	byte* control_mode_b = (byte*) &control_mode;
 	byte* input_mode_b = (byte*) &input_mode;
