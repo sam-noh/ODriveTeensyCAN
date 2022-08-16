@@ -2,6 +2,68 @@
 #define ODriveTeensyCAN_h
 
 #include "Arduino.h"
+#include <FlexCAN_T4.h>
+
+// HeartbeatMsg_t struct defintion
+struct HeartbeatMsg_t {
+    uint32_t axisError = 0;
+    uint8_t currentState = 0;
+    uint8_t motorFlag = 0;
+    uint8_t encoderFlag = 0;
+    uint8_t trajectoryDone = 0;
+    uint8_t controllerFlag = 0;
+
+    // Member function that takes a CAN_message_t (or could just do a raw buf[8])
+    void parseMessage(const CAN_message_t &inMsg) {
+        memcpy(&(axisError), &inMsg.buf[0], 4);
+        currentState = inMsg.buf[4];
+        motorFlag = inMsg.buf[5];
+        encoderFlag = inMsg.buf[6];
+
+        controllerFlag = inMsg.buf[7] & 1UL;
+        trajectoryDone = (inMsg.buf[7] >> 7) & 1UL;
+    }
+};
+
+struct EncoderEstimatesMsg_t {
+	float posEstimate = 0;
+	float velEstimate = 0;
+	
+	void parseMessage(const CAN_message_t &inMsg) {
+        memcpy(&(posEstimate), &inMsg.buf[0], 4);
+        memcpy(&(velEstimate), &inMsg.buf[4], 4);
+	}
+};
+
+struct EncoderCountsMsg_t {
+	int32_t shadowCount = 0;
+	int32_t countInCPR = 0;
+	
+	void parseMessage(const CAN_message_t &inMsg) {
+        memcpy(&(shadowCount), &inMsg.buf[0], 4);
+        memcpy(&(countInCPR), &inMsg.buf[4], 4);
+	}
+};
+
+struct IqMsg_t {
+	float iqSetpoint = 0;
+	float iqMeasured = 0;
+	
+	void parseMessage(const CAN_message_t &inMsg) {
+        memcpy(&(iqSetpoint), &inMsg.buf[0], 4);
+        memcpy(&(iqMeasured), &inMsg.buf[4], 4);
+	}
+};
+
+struct SensorlessEstimatesMsg_t {
+	float posEstimate = 0;
+	float velEstimate = 0;
+	
+	void parseMessage(const CAN_message_t &inMsg) {
+        memcpy(&(posEstimate), &inMsg.buf[0], 4);
+        memcpy(&(velEstimate), &inMsg.buf[4], 4);
+	}
+};
 
 class ODriveTeensyCAN {
 public:
@@ -76,12 +138,13 @@ public:
 
     void sendMessage(int axis_id, int cmd_id, bool remote_transmission_request, int length, byte *signal_bytes);
 	
+	bool ReadMsg(CAN_message_t& inMsg);
+	
 	// Heartbeat
-	int Heartbeat();
+	void Heartbeat(HeartbeatMsg_t &returnVals, CAN_message_t &inMsg);
 
     // Setters
 	void SetAxisNodeId(int axis_id, int node_id);
-	void SetControllerModes(int axis_id, int control_mode);
 	void SetControllerModes(int axis_id, int control_mode, int input_mode);
     void SetPosition(int axis_id, float position);
     void SetPosition(int axis_id, float position, float velocity_feedforward);
@@ -98,20 +161,22 @@ public:
 	void SetVelocityGains(int axis_id, float velocity_gain, float velocity_integrator_gain);
 
     // Getters
-    float GetPosition(int axis_id);
-    float GetVelocity(int axis_id);
-	int32_t GetEncoderShadowCount(int axis_id);
-	int32_t GetEncoderCountInCPR(int axis_id);
-	float GetIqSetpoint(int axis_id);
-	float GetIqMeasured(int axis_id);
-	float GetSensorlessPosition(int axis_id);
-	float GetSensorlessVelocity(int axis_id);
-    uint32_t GetMotorError(int axis_id);
-    uint32_t GetEncoderError(int axis_id);
-    uint32_t GetAxisError(int axis_id);
-    uint8_t GetCurrentState(int axis_id);
-	float GetVbusVoltage(int axis_id);  //Can be sent to either axis
-	float GetADCVoltage(int axis_id, uint8_t gpio_num);  //Can be sent to either axis
+    void GetPositionVelocity(int axis_id);
+    void GetPositionVelocityResponse(EncoderEstimatesMsg_t &returnVal, CAN_message_t &inMsg);
+	void GetEncoderCounts(int axis_id);
+	void GetEncoderCountsResponse(EncoderCountsMsg_t &returnVal, CAN_message_t &inMsg);
+	void GetIq(int axis_id);
+	void GetIqResponse(IqMsg_t &returnVal, CAN_message_t &inMsg);
+	void GetSensorlessEstimates(int axis_id);
+	void GetSensorlessEstimatesResponse(SensorlessEstimatesMsg_t &returnVal, CAN_message_t &inMsg);
+    void GetMotorError(int axis_id);
+	uint64_t GetMotorErrorResponse(CAN_message_t &inMsg);
+    void GetEncoderError(int axis_id);
+    uint32_t GetEncoderErrorResponse(CAN_message_t &inMsg);
+	void GetVbusVoltage(int axis_id);  //Can be sent to either axis
+	float GetVbusVoltageResponse(CAN_message_t &inMsg);
+	void GetADCVoltage(int axis_id, uint8_t gpio_num);
+	float GetADCVoltageResponse(CAN_message_t &inMsg);
 	
 	// Other functions
 	void Estop(int axis_id);
@@ -124,4 +189,4 @@ public:
 
 };
 
-#endif@
+#endif

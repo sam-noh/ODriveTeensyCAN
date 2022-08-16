@@ -16,14 +16,11 @@ static const int CommandIDLength = 5;
 
 static const float feedforwardFactor = 1 / 0.001;
 
-//static const int CANBaudRate = 250000;
-
 // Print with stream operator
 template<class T> inline Print& operator <<(Print &obj,     T arg) { obj.print(arg);    return obj; }
 template<>        inline Print& operator <<(Print &obj, float arg) { obj.print(arg, 4); return obj; }
 
-FlexCAN_T4<CAN0, RX_SIZE_256, TX_SIZE_16> Can0;
-// FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> Can0;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can0;
 
 ODriveTeensyCAN::ODriveTeensyCAN(int CANBaudRate) {
     this->CANBaudRate = CANBaudRate;
@@ -33,17 +30,17 @@ ODriveTeensyCAN::ODriveTeensyCAN(int CANBaudRate) {
 
 void ODriveTeensyCAN::sendMessage(int axis_id, int cmd_id, bool remote_transmission_request, int length, byte *signal_bytes) {
     CAN_message_t msg;
-    CAN_message_t return_msg;
+    //CAN_message_t return_msg;
 
     msg.id = (axis_id << CommandIDLength) + cmd_id;
     msg.flags.remote = remote_transmission_request;
     msg.len = length;
-    if (!remote_transmission_request && cmd_id != CMD_ID_GET_ADC_VOLTAGE) {
+    if(!remote_transmission_request) {  // && cmd_id != CMD_ID_GET_ADC_VOLTAGE) {
         memcpy(msg.buf, signal_bytes, length);
         Can0.write(msg);
         return;
     }
-
+/*
 	if(cmd_id == CMD_ID_GET_ADC_VOLTAGE) {
         memcpy(msg.buf, signal_bytes, length);
 		uint32_t return_id = (axis_id << CommandIDLength) + CMD_ID_SEND_ADC_VOLTAGE;
@@ -55,34 +52,33 @@ void ODriveTeensyCAN::sendMessage(int axis_id, int cmd_id, bool remote_transmiss
 				return;
 			}
 		}
-	}
+	}*/
 	
 	Can0.write(msg);
-    while (true) {
+    /*while (true) {
         if (Can0.read(return_msg) && (return_msg.id == msg.id)) {
             memcpy(signal_bytes, return_msg.buf, sizeof(return_msg.buf));
             return;
         }
-    }
+    }*/
 }
 
-int ODriveTeensyCAN::Heartbeat() {
-    CAN_message_t return_msg;
-	if(Can0.read(return_msg) == 1) {
-		return (int)(return_msg.id >> 5);
+bool ODriveTeensyCAN::ReadMsg(CAN_message_t& inMsg) {
+	if(Can0.read(inMsg)) {
+		return true;
 	} else {
-		return -1;
+		return false;
 	}
+}
+
+void ODriveTeensyCAN::Heartbeat(HeartbeatMsg_t &returnVals, CAN_message_t &inMsg) {
+	returnVals.parseMessage(inMsg);
 }
 
 void ODriveTeensyCAN::SetAxisNodeId(int axis_id, int node_id) {
 	byte* node_id_b = (byte*) &node_id;
 	
 	sendMessage(axis_id, CMD_ID_SET_AXIS_NODE_ID, false, 4, node_id_b);
-}
-
-void ODriveTeensyCAN::SetControllerModes(int axis_id, int control_mode) {
-	SetControllerModes(int axis_id, int control_mode, 1);  //1 == default input_mode as passthrough
 }
 
 void ODriveTeensyCAN::SetControllerModes(int axis_id, int control_mode, int input_mode) {
@@ -235,198 +231,109 @@ void ODriveTeensyCAN::SetVelocityGains(int axis_id, float velocity_gain, float v
 
 //////////// Get functions ///////////
 
-float ODriveTeensyCAN::GetPosition(int axis_id) {
+void ODriveTeensyCAN::GetPositionVelocity(int axis_id) {
     byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
+	
     sendMessage(axis_id, CMD_ID_GET_ENCODER_ESTIMATES, true, 8, msg_data);
-
-    float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
-    return output;
 }
 
-float ODriveTeensyCAN::GetVelocity(int axis_id) {
-    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-    sendMessage(axis_id, CMD_ID_GET_ENCODER_ESTIMATES, true, 8, msg_data);
-
-    float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[4];
-    *((uint8_t *)(&output) + 1) = msg_data[5];
-    *((uint8_t *)(&output) + 2) = msg_data[6];
-    *((uint8_t *)(&output) + 3) = msg_data[7];
-    return output;
+void ODriveTeensyCAN::GetPositionVelocityResponse(EncoderEstimatesMsg_t &returnVal, CAN_message_t &inMsg) {
+	returnVal.parseMessage(inMsg);
 }
 
-int32_t ODriveTeensyCAN::GetEncoderShadowCount(int axis_id) {
+void ODriveTeensyCAN::GetEncoderCounts(int axis_id) {
 	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     sendMessage(axis_id, CMD_ID_GET_ENCODER_COUNT, true, 8, msg_data);
-	
-	int32_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
-    return output;
 }
 
-int32_t ODriveTeensyCAN::GetEncoderCountInCPR(int axis_id) {
-	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-    sendMessage(axis_id, CMD_ID_GET_ENCODER_COUNT, true, 8, msg_data);
-	
-	int32_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[4];
-    *((uint8_t *)(&output) + 1) = msg_data[5];
-    *((uint8_t *)(&output) + 2) = msg_data[6];
-    *((uint8_t *)(&output) + 3) = msg_data[7];
-    return output;
+void ODriveTeensyCAN::GetEncoderCountsResponse(EncoderCountsMsg_t &returnVal, CAN_message_t &inMsg) {
+	returnVal.parseMessage(inMsg);
 }
 
-float ODriveTeensyCAN::GetIqSetpoint(int axis_id) {
+void ODriveTeensyCAN::GetIq(int axis_id) {
 	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     sendMessage(axis_id, CMD_ID_GET_IQ, true, 8, msg_data);
-	
-	float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
-    return output;
 }
 
-float ODriveTeensyCAN::GetIqMeasured(int axis_id) {
-	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-    sendMessage(axis_id, CMD_ID_GET_IQ, true, 8, msg_data);
-	
-	float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[4];
-    *((uint8_t *)(&output) + 1) = msg_data[5];
-    *((uint8_t *)(&output) + 2) = msg_data[6];
-    *((uint8_t *)(&output) + 3) = msg_data[7];
-    return output;
+void ODriveTeensyCAN::GetIqResponse(IqMsg_t &returnVal, CAN_message_t &inMsg) {
+	returnVal.parseMessage(inMsg);
 }
 
-float ODriveTeensyCAN::GetSensorlessPosition(int axis_id) {
+void ODriveTeensyCAN::GetSensorlessEstimates(int axis_id) {
 	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     sendMessage(axis_id, CMD_ID_GET_SENSORLESS_ESTIMATES, true, 8, msg_data);
-	
-	float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
-    return output;
 }
 
-float ODriveTeensyCAN::GetSensorlessVelocity(int axis_id) {
-	byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-    sendMessage(axis_id, CMD_ID_GET_SENSORLESS_ESTIMATES, true, 8, msg_data);
-	
-	float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[4];
-    *((uint8_t *)(&output) + 1) = msg_data[5];
-    *((uint8_t *)(&output) + 2) = msg_data[6];
-    *((uint8_t *)(&output) + 3) = msg_data[7];
-    return output;
+void ODriveTeensyCAN::GetSensorlessEstimatesResponse(SensorlessEstimatesMsg_t &returnVal, CAN_message_t &inMsg) {
+	returnVal.parseMessage(inMsg);
 }
 
-uint32_t ODriveTeensyCAN::GetMotorError(int axis_id) {
-    byte msg_data[4] = {0, 0, 0, 0};
-
-    sendMessage(axis_id, CMD_ID_GET_MOTOR_ERROR, true, 4, msg_data);
-
-    uint32_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
-    return output;
-}
-
-uint32_t ODriveTeensyCAN::GetEncoderError(int axis_id) {
-    byte msg_data[4] = {0, 0, 0, 0};
-
-    sendMessage(axis_id, CMD_ID_GET_ENCODER_ERROR, true, 4, msg_data);
-
-    uint32_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
-    return output;
-}
-
-uint32_t ODriveTeensyCAN::GetAxisError(int axis_id) {
+void ODriveTeensyCAN::GetMotorError(int axis_id) {
     byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    uint32_t output;
 
-    CAN_message_t return_msg;
-
-    int msg_id = (axis_id << CommandIDLength) + CMD_ID_ODRIVE_HEARTBEAT_MESSAGE;
-
-    while (true) {
-        if (Can0.read(return_msg) && (return_msg.id == msg_id)) {
-            memcpy(msg_data, return_msg.buf, sizeof(return_msg.buf));
-            *((uint8_t *)(&output) + 0) = msg_data[0];
-            *((uint8_t *)(&output) + 1) = msg_data[1];
-            *((uint8_t *)(&output) + 2) = msg_data[2];
-            *((uint8_t *)(&output) + 3) = msg_data[3];
-            return output;
-        }
-    }
+    sendMessage(axis_id, CMD_ID_GET_MOTOR_ERROR, true, 8, msg_data);
 }
 
-uint8_t ODriveTeensyCAN::GetCurrentState(int axis_id) {
+uint64_t ODriveTeensyCAN::GetMotorErrorResponse(CAN_message_t &inMsg) {
+    uint64_t output;
+    *((uint8_t *)(&output) + 0) = inMsg.buf[0];
+    *((uint8_t *)(&output) + 1) = inMsg.buf[1];
+    *((uint8_t *)(&output) + 2) = inMsg.buf[2];
+    *((uint8_t *)(&output) + 3) = inMsg.buf[3];
+    *((uint8_t *)(&output) + 0) = inMsg.buf[4];
+    *((uint8_t *)(&output) + 1) = inMsg.buf[5];
+    *((uint8_t *)(&output) + 2) = inMsg.buf[6];
+    *((uint8_t *)(&output) + 3) = inMsg.buf[7];
+    return output;
+}
+
+void ODriveTeensyCAN::GetEncoderError(int axis_id) {
     byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    uint8_t output;
 
-    CAN_message_t return_msg;
-
-    int msg_id = (axis_id << CommandIDLength) + CMD_ID_ODRIVE_HEARTBEAT_MESSAGE;
-
-    while (true) {
-        if (Can0.read(return_msg) && (return_msg.id == msg_id)) {
-            memcpy(msg_data, return_msg.buf, sizeof(return_msg.buf));
-            *((uint8_t *)(&output) + 0) = msg_data[4];
-            return output;
-        }
-    }
+    sendMessage(axis_id, CMD_ID_GET_ENCODER_ERROR, true, 8, msg_data);
 }
 
-float ODriveTeensyCAN::GetVbusVoltage(int axis_id) {  //message can be sent to either axis
+uint32_t ODriveTeensyCAN::GetEncoderErrorResponse(CAN_message_t &inMsg) {
+    uint32_t output;
+    *((uint8_t *)(&output) + 0) = inMsg.buf[0];
+    *((uint8_t *)(&output) + 1) = inMsg.buf[1];
+    *((uint8_t *)(&output) + 2) = inMsg.buf[2];
+    *((uint8_t *)(&output) + 3) = inMsg.buf[3];
+    return output;
+}
+
+void ODriveTeensyCAN::GetVbusVoltage(int axis_id) {  //message can be sent to either axis
     byte msg_data[4] = {0, 0, 0, 0};
 
     sendMessage(axis_id, CMD_ID_GET_VBUS_VOLTAGE, true, 4, msg_data);
+}
 
+float ODriveTeensyCAN::GetVbusVoltageResponse(CAN_message_t &inMsg) {
     float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
+    *((uint8_t *)(&output) + 0) = inMsg.buf[0];
+    *((uint8_t *)(&output) + 1) = inMsg.buf[1];
+    *((uint8_t *)(&output) + 2) = inMsg.buf[2];
+    *((uint8_t *)(&output) + 3) = inMsg.buf[3];
     return output;
 }
 
-float ODriveTeensyCAN::GetADCVoltage(int axis_id, uint8_t gpio_num) {
-    byte msg_data[4] = {0, 0, 0, 0};
+void ODriveTeensyCAN::GetADCVoltage(int axis_id, uint8_t gpio_num) {
+    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	msg_data[0] = gpio_num;
 	
-    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, false, 1, msg_data);  //RTR must be false!
+    sendMessage(axis_id, CMD_ID_GET_ADC_VOLTAGE, false, 8, msg_data);  //RTR must be false!
+}
 
+float ODriveTeensyCAN::GetADCVoltageResponse(CAN_message_t &inMsg) {
     float_t output;
-    *((uint8_t *)(&output) + 0) = msg_data[0];
-    *((uint8_t *)(&output) + 1) = msg_data[1];
-    *((uint8_t *)(&output) + 2) = msg_data[2];
-    *((uint8_t *)(&output) + 3) = msg_data[3];
+    *((uint8_t *)(&output) + 0) = inMsg.buf[0];
+    *((uint8_t *)(&output) + 1) = inMsg.buf[1];
+    *((uint8_t *)(&output) + 2) = inMsg.buf[2];
+    *((uint8_t *)(&output) + 3) = inMsg.buf[3];
     return output;
 }
 

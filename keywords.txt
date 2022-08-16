@@ -1,48 +1,49 @@
 #############################
-#	Data Types - KEYWORD1	#
+#	Data Types - LITERAL1	#
 #############################
 
-
+HeartbeatMsg_t	LITERAL1
+EncoderEstimatesMsg_t	LITERAL1
+EncoderCountsMsg_t	LITERAL1
+IqMsg_t	LITERAL1
+SensorlessEstimatesMsg_t	LITERAL1
 
 #############################
 #	Functions - KEYWORD2	#
 #############################
 
-Heartbeat	       KEYWORD1
-SetAxisNodeId      KEYWORD1
-SetControllerModes     KEYWORD1
-SetTrajVelLimit     KEYWORD1
-SetTrajAccelLimits  KEYWORD1
-SetTrajInertia      KEYWORD1
-SetPosition	KEYWORD1
-SetVelocity	KEYWORD1
-SetTorque	KEYWORD1
-GetPosition	KEYWORD1
-GetVelocity	KEYWORD1
-GetEncoderShadowCount  KEYWORD1
-GetEncoderCountInCPR   KEYWORD1
-GetEncoderShadowCount  KEYWORD1
-GetEncoderCountInCPR   KEYWORD1
-GetIqSetpoint          KEYWORD1
-GetIqMeasured          KEYWORD1
-GetSensorlessPosition  KEYWORD1
-GetSensorlessVelocity  KEYWORD1
-GetMotorError	KEYWORD1
-GetEncoderError	KEYWORD1
-GetAxisError	KEYWORD1
-GetCurrentState	KEYWORD1
-GetVbusVoltage  KEYWORD1
-GetADCVoltage	KEYWORD1
-Estop           KEYWORD1
-StartAnticogging  KEYWORD1
-RebootOdrive    KEYWORD1
-ClearErrors     KEYWORD1
-RunState	    KEYWORD1
+ReadMsg	KEYWORD2
+Heartbeat	KEYWORD2
+SetAxisNodeId	KEYWORD2
+SetControllerModes	KEYWORD2
+SetTrajVelLimit	KEYWORD2
+SetTrajAccelLimits	KEYWORD2
+SetTrajInertia	KEYWORD2
+SetPosition	KEYWORD2
+SetVelocity	KEYWORD2
+SetTorque	KEYWORD2
+SetLimits	KEYWORD2
+SetLinearCount	KEYWORD2
+SetPositionGain	KEYWORD2
+SetVelocityGains	KEYWORD2
+GetPositionVelocity	KEYWORD2
+GetEncoderCounts	KEYWORD2
+GetIq	KEYWORD2
+GetSensorlessEstimates	KEYWORD2
+GetMotorError	KEYWORD2
+GetEncoderError	KEYWORD2
+GetVbusVoltage	KEYWORD2
+GetADCVoltage	KEYWORD2
+Estop	KEYWORD2
+StartAnticogging	KEYWORD2
+RebootOdrive	KEYWORD2
+ClearErrors	KEYWORD2
+RunState	KEYWORD2
 
 
 #############################
-#	Instances - KEYWORD2	#
+#	Instances - KEYWORD1	#
 #############################
 
-ODriveTeensyCAN	KEYWORD2
+ODriveTeensyCAN	KEYWORD1
 
