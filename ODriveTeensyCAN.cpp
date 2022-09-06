@@ -290,6 +290,21 @@ uint64_t ODriveTeensyCAN::GetMotorErrorResponse(CAN_message_t &inMsg) {
     return output;
 }
 
+void ODriveTeensyCAN::GetControllerError(int axis_id) {
+    byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    sendMessage(axis_id, CMD_ID_GET_CONTROLLER_ERROR, true, 8, msg_data);
+}
+
+uint32_t ODriveTeensyCAN::GetControllerErrorResponse(CAN_message_t &inMsg) {
+    uint32_t output;
+    *((uint8_t *)(&output) + 0) = inMsg.buf[0];
+    *((uint8_t *)(&output) + 1) = inMsg.buf[1];
+    *((uint8_t *)(&output) + 2) = inMsg.buf[2];
+    *((uint8_t *)(&output) + 3) = inMsg.buf[3];
+    return output;
+}
+
 void ODriveTeensyCAN::GetEncoderError(int axis_id) {
     byte msg_data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 

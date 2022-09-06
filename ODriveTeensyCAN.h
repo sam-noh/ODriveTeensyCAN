@@ -128,7 +128,7 @@ public:
 		CMD_ID_SET_POS_GAIN = 0x01A,
 		CMD_ID_SET_VEL_GAINS = 0x01B,
 		CMD_ID_GET_ADC_VOLTAGE = 0x01C,
-		CMD_ID_SEND_ADC_VOLTAGE = 0x01D,
+		CMD_ID_GET_CONTROLLER_ERROR = 0x01D,
         CMD_ID_CANOPEN_HEARTBEAT_MESSAGE = 0x700
     };
 
@@ -171,6 +171,8 @@ public:
 	void GetSensorlessEstimatesResponse(SensorlessEstimatesMsg_t &returnVal, CAN_message_t &inMsg);
     void GetMotorError(int axis_id);
 	uint64_t GetMotorErrorResponse(CAN_message_t &inMsg);
+    void GetControllerError(int axis_id);
+    uint32_t GetControllerErrorResponse(CAN_message_t &inMsg);
     void GetEncoderError(int axis_id);
     uint32_t GetEncoderErrorResponse(CAN_message_t &inMsg);
 	void GetVbusVoltage(int axis_id);  //Can be sent to either axis
