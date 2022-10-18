@@ -32,6 +32,7 @@ GetIq	KEYWORD2
 GetSensorlessEstimates	KEYWORD2
 GetMotorError	KEYWORD2
 GetEncoderError	KEYWORD2
+GetControllerError	KEYWORD2
 GetVbusVoltage	KEYWORD2
 GetADCVoltage	KEYWORD2
 Estop	KEYWORD2
