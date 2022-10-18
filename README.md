@@ -30,7 +30,6 @@ Create a variable of type `CAN_message_t` and use `ReadMsg()` inside an if state
 
 The library defines structs that help contain the data received from CAN messages. You can use them to easily store data from messages that send multiple values in a single message like encoder estimates message. First, create new variables of type `HeartbeatMsg_t`, `EncoderEstimatesMsg_t`, `EncoderCountsMsg_t`, `SensorlessEstimatesMsg_t` or `IqMsg_t`. Then use the handler function to store data in the struct.
 ```
-
 HeartbeatMsg_t returnVals;
 IqMsg_t iqVals;
 
@@ -48,7 +47,8 @@ void handleCANMsg(CAN_message_t inMsg) {
       default:
         break;
     }
-}```
+}
+```
 To store data from messages that send only one value, simply define a variable of the correct type and treat the CAN message like any other function that returns a value
 ```
 float adcVoltage;
