@@ -64,6 +64,6 @@ float vbusVoltage;
 	  ...
 ```
 		
-		### Sending Messages
+### Sending Messages
 
 Sending messages with the library works the same as calling any other function with the required arguments. For example, to set a new node id you can you call the function `odriveCAN.SetAxisNodeId(0, 1)` where 0 is the axis id and 1 is the desired node id.
